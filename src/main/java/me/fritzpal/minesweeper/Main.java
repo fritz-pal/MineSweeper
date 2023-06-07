@@ -2,6 +2,6 @@ package me.fritzpal.minesweeper;
 
 public class Main {
     public static void main(String[] args) {
-        new Window();
+        new Window(30, 200);
     }
 }

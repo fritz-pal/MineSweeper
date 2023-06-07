@@ -9,14 +9,21 @@ public class Board extends JPanel {
     private final int mines;
     private boolean firstClick = true;
     private boolean lost = false;
+    private int minesLeft;
+    private final Window window;
 
-    public Board(int rows, int columns, int mines) {
+    public Board(Window window, int rows, int columns, int mines) {
+        this.window = window;
         this.rows = rows;
         this.columns = columns;
         this.mines = mines;
+        this.minesLeft = mines;
         this.tiles = new Tile[rows][columns];
         this.setLayout(null);
         this.initialize();
+
+        this.setBounds(0, window.getTileSize() * 2, window.getBoardSize() * window.getTileSize(), window.getBoardSize() * window.getTileSize());
+        window.add(this);
     }
 
     private void initialize() {
@@ -74,17 +81,12 @@ public class Board extends JPanel {
     }
 
     public void gameOver() {
-        lost = true;
         for (Tile[] tile : tiles) {
             for (Tile value : tile) {
                 value.setState(TileState.UNCOVERED);
                 value.repaint();
             }
         }
-    }
-
-    public Tile[][] getTiles() {
-        return this.tiles;
     }
 
     public boolean isFirstClick() {
@@ -95,6 +97,15 @@ public class Board extends JPanel {
         return this.lost;
     }
 
+    public int getMinesLeft() {
+        return this.minesLeft;
+    }
+
+    public void setMinesLeft(int minesLeft) {
+        this.minesLeft = minesLeft;
+        window.updateMines();
+    }
+
     public void uncover(int row, int column) {
         if (row < 0 || row >= this.rows || column < 0 || column >= this.columns) return;
         if (this.tiles[row][column].getState() == TileState.UNCOVERED) return;
@@ -103,6 +114,8 @@ public class Board extends JPanel {
 
         if (tiles[row][column].isMine()) {
             gameOver();
+            window.stopTime();
+            lost = true;
             return;
         }
 
@@ -113,5 +126,41 @@ public class Board extends JPanel {
                 }
             }
         }
+    }
+
+    public void reset(){
+        firstClick = true;
+        lost = false;
+        minesLeft = mines;
+        window.updateMines();
+        window.resetTime();
+        for (Tile[] tile : tiles) {
+            for (Tile value : tile) {
+                value.setState(TileState.COVERED);
+                value.setMine(false);
+                value.setAdjacentMines(0);
+                value.repaint();
+            }
+        }
+    }
+
+    public void checkWin() {
+        int uncovered = 0;
+        for (Tile[] tile : tiles) {
+            for (Tile value : tile) {
+                if (value.getState() == TileState.UNCOVERED) {
+                    uncovered++;
+                }
+            }
+        }
+        if (uncovered == rows * columns - mines) {
+            gameOver();
+            window.stopTime();
+            JOptionPane.showMessageDialog(window, "You won in " + window.getTime() + " seconds!");
+        }
+    }
+
+    public int getTileSize() {
+        return window.getTileSize();
     }
 }

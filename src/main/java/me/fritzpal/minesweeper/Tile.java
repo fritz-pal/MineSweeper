@@ -22,7 +22,8 @@ public class Tile extends JButton {
         this.state = TileState.COVERED;
         this.isMine = false;
         this.adjacentMines = 0;
-        this.setBounds(row * Window.TILE_SIZE, column * Window.TILE_SIZE, Window.TILE_SIZE, Window.TILE_SIZE);
+        this.setBounds(row * board.getTileSize(), column * board.getTileSize(), board.getTileSize(), board.getTileSize());
+        this.setFocusable(false);
 
         this.addMouseListener(mouseListener());
         board.add(this);
@@ -34,7 +35,9 @@ public class Tile extends JButton {
             public void mousePressed(MouseEvent e) {
                 if (state == TileState.COVERED) {
                     if (e.getButton() == 3) {
+                        if (System.currentTimeMillis() - flagTime < 100) return;
                         state = TileState.FLAGGED;
+                        board.setMinesLeft(board.getMinesLeft() - 1);
                         flagTime = System.currentTimeMillis();
                         repaint();
                     } else {
@@ -42,9 +45,12 @@ public class Tile extends JButton {
                             board.setMines(row, column);
                         }
                         board.uncover(row, column);
+                        board.checkWin();
                     }
                 } else if (state == TileState.FLAGGED && e.getButton() == 3 && System.currentTimeMillis() - flagTime > 100) {
                     state = TileState.COVERED;
+                    flagTime = System.currentTimeMillis();
+                    board.setMinesLeft(board.getMinesLeft() + 1);
                     repaint();
                 }
             }
@@ -80,21 +86,21 @@ public class Tile extends JButton {
         super.paintComponent(g);
 
         if (state == TileState.UNCOVERED) {
-            g.setColor(Color.WHITE);
-            g.fillRect(0, 0, Window.TILE_SIZE, Window.TILE_SIZE);
+            g.setColor(Color.LIGHT_GRAY);
+            g.fillRect(0, 0, board.getTileSize(), board.getTileSize());
             if (isMine) {
                 if (board.isLost()) {
                     g.setColor(Color.RED);
-                    g.fillRect(0, 0, Window.TILE_SIZE, Window.TILE_SIZE);
+                    g.fillRect(0, 0, board.getTileSize(), board.getTileSize());
                 }
-                g.drawImage(new ImageIcon("src/main/resources/mine.png").getImage(), 0, 0, Window.TILE_SIZE, Window.TILE_SIZE, null);
+                g.drawImage(ImagePath.getResource("mine.png"), 0, 0, board.getTileSize(), board.getTileSize(), null);
             } else if (adjacentMines > 0) {
-                g.setColor(Window.colors[adjacentMines]);
-                g.setFont(new Font("Arial", Font.BOLD, 20));
-                g.drawString(String.valueOf(adjacentMines), 5, Window.TILE_SIZE - 5);
+                g.setColor(Window.colors[adjacentMines - 1]);
+                g.setFont(new Font("Calibri", Font.BOLD, board.getTileSize()));
+                g.drawString(String.valueOf(adjacentMines), 5, board.getTileSize() - 5);
             }
         } else if (state == TileState.FLAGGED) {
-            g.drawImage(new ImageIcon("src/main/resources/flag.png").getImage(), 0, 0, Window.TILE_SIZE, Window.TILE_SIZE, null);
+            g.drawImage(ImagePath.getResource("flag.png"), 0, 0, board.getTileSize(), board.getTileSize(), null);
         }
     }
 }
