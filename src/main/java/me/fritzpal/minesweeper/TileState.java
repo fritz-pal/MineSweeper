@@ -1,4 +1,7 @@
 package me.fritzpal.minesweeper;
 
-public enum CellState {
+public enum TileState {
+    COVERED,
+    UNCOVERED,
+    FLAGGED
 }
