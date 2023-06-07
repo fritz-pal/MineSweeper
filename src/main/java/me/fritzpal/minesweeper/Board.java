@@ -101,6 +101,11 @@ public class Board extends JPanel {
         tiles[row][column].setState(TileState.UNCOVERED);
         tiles[row][column].repaint();
 
+        if (tiles[row][column].isMine()) {
+            gameOver();
+            return;
+        }
+
         if (tiles[row][column].getAdjacentMines() == 0) {
             for (int i = -1; i <= 1; i++) {
                 for (int j = -1; j <= 1; j++) {

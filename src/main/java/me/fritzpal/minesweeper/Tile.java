@@ -13,6 +13,7 @@ public class Tile extends JButton {
     private TileState state;
     private boolean isMine;
     private int adjacentMines;
+    private long flagTime = 0;
 
     public Tile(Board board, int row, int column) {
         this.board = board;
@@ -31,18 +32,20 @@ public class Tile extends JButton {
         return new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                if (board.isFirstClick()) {
-                    board.setMines(row, column);
-                }
                 if (state == TileState.COVERED) {
                     if (e.getButton() == 3) {
                         state = TileState.FLAGGED;
+                        flagTime = System.currentTimeMillis();
+                        repaint();
                     } else {
+                        if (board.isFirstClick()) {
+                            board.setMines(row, column);
+                        }
                         board.uncover(row, column);
                     }
-                } else if (state == TileState.FLAGGED && e.getButton() == 3) {
+                } else if (state == TileState.FLAGGED && e.getButton() == 3 && System.currentTimeMillis() - flagTime > 100) {
                     state = TileState.COVERED;
-                    board.gameOver();
+                    repaint();
                 }
             }
         };

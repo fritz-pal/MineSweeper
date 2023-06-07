@@ -2,7 +2,6 @@ package me.fritzpal.minesweeper;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.HashMap;
 
 public class Window extends JFrame {
     public static int BOARD_SIZE = 30;
