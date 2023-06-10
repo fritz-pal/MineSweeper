@@ -7,10 +7,10 @@ public class Board extends JPanel {
     private final int rows;
     private final int columns;
     private final int mines;
+    private final Window window;
     private boolean firstClick = true;
     private boolean lost = false;
     private int minesLeft;
-    private final Window window;
 
     public Board(Window window, int rows, int columns, int mines) {
         this.window = window;
@@ -81,6 +81,7 @@ public class Board extends JPanel {
     }
 
     public void gameOver() {
+        Sound.play("lose.wav");
         for (Tile[] tile : tiles) {
             for (Tile value : tile) {
                 value.setState(TileState.UNCOVERED);
@@ -106,7 +107,7 @@ public class Board extends JPanel {
         window.updateMines();
     }
 
-    public void uncover(int row, int column) {
+    public void uncover(int row, int column, boolean withSound) {
         if (row < 0 || row >= this.rows || column < 0 || column >= this.columns) return;
         if (this.tiles[row][column].getState() == TileState.UNCOVERED) return;
         tiles[row][column].setState(TileState.UNCOVERED);
@@ -122,13 +123,20 @@ public class Board extends JPanel {
         if (tiles[row][column].getAdjacentMines() == 0) {
             for (int i = -1; i <= 1; i++) {
                 for (int j = -1; j <= 1; j++) {
-                    uncover(row + i, column + j);
+                    uncover(row + i, column + j, false);
                 }
             }
+            if (withSound) {
+                Sound.play("uncover.wav");
+            }
+            return;
+        }
+        if (withSound) {
+            Sound.play("tick.wav");
         }
     }
 
-    public void reset(){
+    public void reset() {
         firstClick = true;
         lost = false;
         minesLeft = mines;

@@ -40,11 +40,12 @@ public class Tile extends JButton {
                         board.setMinesLeft(board.getMinesLeft() - 1);
                         flagTime = System.currentTimeMillis();
                         repaint();
+                        Sound.play("flag.wav");
                     } else {
                         if (board.isFirstClick()) {
                             board.setMines(row, column);
                         }
-                        board.uncover(row, column);
+                        board.uncover(row, column, true);
                         board.checkWin();
                     }
                 } else if (state == TileState.FLAGGED && e.getButton() == 3 && System.currentTimeMillis() - flagTime > 100) {
@@ -52,6 +53,7 @@ public class Tile extends JButton {
                     flagTime = System.currentTimeMillis();
                     board.setMinesLeft(board.getMinesLeft() + 1);
                     repaint();
+                    Sound.play("flag.wav");
                 }
             }
         };
