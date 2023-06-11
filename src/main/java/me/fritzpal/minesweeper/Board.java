@@ -81,7 +81,6 @@ public class Board extends JPanel {
     }
 
     public void gameOver() {
-        Sound.play("lose.wav");
         for (Tile[] tile : tiles) {
             for (Tile value : tile) {
                 value.setState(TileState.UNCOVERED);
@@ -114,6 +113,7 @@ public class Board extends JPanel {
         tiles[row][column].repaint();
 
         if (tiles[row][column].isMine()) {
+            Sound.play("lose.wav");
             gameOver();
             window.stopTime();
             lost = true;
@@ -162,6 +162,7 @@ public class Board extends JPanel {
             }
         }
         if (uncovered == rows * columns - mines) {
+            Sound.play("win.wav");
             gameOver();
             window.stopTime();
             JOptionPane.showMessageDialog(window, "You won in " + window.getTime() + " seconds!");
