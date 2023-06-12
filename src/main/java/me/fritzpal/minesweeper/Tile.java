@@ -14,6 +14,7 @@ public class Tile extends JButton {
     private boolean isMine;
     private int adjacentMines;
     private long flagTime = 0;
+    private boolean isRed = false;
 
     public Tile(Board board, int row, int column) {
         this.board = board;
@@ -33,6 +34,7 @@ public class Tile extends JButton {
         return new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
+                if (board.isLost()) return;
                 if (state == TileState.COVERED) {
                     if (e.getButton() == 3) {
                         if (System.currentTimeMillis() - flagTime < 100) return;
@@ -91,7 +93,7 @@ public class Tile extends JButton {
             g.setColor(Color.LIGHT_GRAY);
             g.fillRect(0, 0, board.getTileSize(), board.getTileSize());
             if (isMine) {
-                if (board.isLost()) {
+                if (board.isLost() && isRed) {
                     g.setColor(Color.RED);
                     g.fillRect(0, 0, board.getTileSize(), board.getTileSize());
                 }
@@ -104,5 +106,9 @@ public class Tile extends JButton {
         } else if (state == TileState.FLAGGED) {
             g.drawImage(ImagePath.getResource("flag.png"), 0, 0, board.getTileSize(), board.getTileSize(), null);
         }
+    }
+
+    public void setRed(boolean red) {
+        this.isRed = red;
     }
 }

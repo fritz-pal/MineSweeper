@@ -15,7 +15,7 @@ public class Window extends JFrame {
     public Window(int size, int mines) {
         super("Minesweeper");
         this.boardSize = size;
-        this.tileSize = 800 / boardSize;
+        this.tileSize = 25;
 
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setSize(boardSize * tileSize, boardSize * tileSize + tileSize * 2);

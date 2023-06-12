@@ -44,13 +44,15 @@ public class Board extends JPanel {
         }
 
         int mines = 0;
-        while (mines < this.mines) {
+        int counter = 0;
+        while (mines < this.mines && counter < this.mines * 1000) {
             int randomRow = (int) (Math.random() * this.rows);
             int randomColumn = (int) (Math.random() * this.columns);
-            if (randomRow != row && randomColumn != column && !this.tiles[randomRow][randomColumn].isMine()) {
+            if (!(randomRow == row && randomColumn == column) && !this.tiles[randomRow][randomColumn].isMine() && !isAdjacent(randomRow, randomColumn, row, column)) {
                 this.tiles[randomRow][randomColumn].setMine(true);
                 mines++;
             }
+            counter++;
         }
 
         for (int r = 0; r < this.rows; r++) {
@@ -58,9 +60,10 @@ public class Board extends JPanel {
                 this.tiles[r][c].setAdjacentMines(this.getAdjacentMines(r, c));
             }
         }
-        if (tiles[row][column].getAdjacentMines() != 0) {
-            setMines(row, column);
-        }
+    }
+
+    private boolean isAdjacent(int row, int column, int targetRow, int targetColumn) {
+        return row >= targetRow - 1 && row <= targetRow + 1 && column >= targetColumn - 1 && column <= targetColumn + 1;
     }
 
     public int getAdjacentMines(int row, int column) {
@@ -83,8 +86,10 @@ public class Board extends JPanel {
     public void gameOver() {
         for (Tile[] tile : tiles) {
             for (Tile value : tile) {
-                value.setState(TileState.UNCOVERED);
-                value.repaint();
+                if (value.isMine()) {
+                    value.setState(TileState.UNCOVERED);
+                    value.repaint();
+                }
             }
         }
     }
@@ -117,6 +122,7 @@ public class Board extends JPanel {
             gameOver();
             window.stopTime();
             lost = true;
+            tiles[row][column].setRed(true);
             return;
         }
 
@@ -126,14 +132,8 @@ public class Board extends JPanel {
                     uncover(row + i, column + j, false);
                 }
             }
-            if (withSound) {
-                Sound.play("uncover.wav");
-            }
-            return;
-        }
-        if (withSound) {
-            Sound.play("tick.wav");
-        }
+            if (withSound) Sound.play("uncover.wav");
+        } else if (withSound) Sound.play("tick.wav");
     }
 
     public void reset() {
@@ -145,6 +145,7 @@ public class Board extends JPanel {
         for (Tile[] tile : tiles) {
             for (Tile value : tile) {
                 value.setState(TileState.COVERED);
+                value.setRed(false);
                 value.setMine(false);
                 value.setAdjacentMines(0);
                 value.repaint();

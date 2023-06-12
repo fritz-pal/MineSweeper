@@ -7,9 +7,9 @@ public class Main {
         String[] options = {"Easy", "Medium", "Hard", "Impossible", "Custom"};
         int option = JOptionPane.showOptionDialog(null, "Choose a difficulty", "Minesweeper", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
         switch (option) {
-            case 0 -> new Window(15, 20);
-            case 1 -> new Window(20, 50);
-            case 2 -> new Window(25, 100);
+            case 0 -> new Window(9, 10);
+            case 1 -> new Window(16, 40);
+            case 2 -> new Window(23, 100);
             case 3 -> new Window(30, 180);
             case 4 -> {
                 JTextField textField1 = new JTextField();
