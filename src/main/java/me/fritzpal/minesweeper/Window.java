@@ -4,13 +4,13 @@ import javax.swing.*;
 import java.awt.*;
 
 public class Window extends JFrame {
-    public static Color[] colors = {Color.BLUE, new Color(0x007c00), Color.RED, Color.MAGENTA, new Color(0xfd9004), new Color(0x0097a7), new Color(0x7d007d), Color.BLACK};
     private final int boardSize;
     private final int tileSize;
     private final Board board;
     private final JLabel minesLeft;
     private final JLabel time = new JLabel("0");
     private final Timer timer;
+    JButton reset = new JButton();
 
     public Window(int size, int mines) {
         super("Minesweeper");
@@ -44,9 +44,9 @@ public class Window extends JFrame {
         minesLeft.setBounds(0, 0, boardSize * tileSize / 3, tileSize * 2);
         this.add(minesLeft);
 
-        JButton reset = new JButton("Reset");
-        reset.setBounds(boardSize * tileSize / 2 - 40, tileSize / 2, 80, tileSize);
+        reset.setBounds((int) (boardSize * tileSize / 2 - ((tileSize*1.5/2))), (int) (tileSize - (tileSize*1.5/2)), (int) (tileSize * 1.5), (int) (tileSize * 1.5));
         reset.setFocusable(false);
+        reset.setIcon(new ImageIcon(ImagePath.getResource("smile.png").getScaledInstance((int) (tileSize * 1.5), (int) (tileSize * 1.5), Image.SCALE_SMOOTH)));
         reset.addActionListener(e -> board.reset());
         this.add(reset);
 
@@ -68,6 +68,10 @@ public class Window extends JFrame {
     public void resetTime() {
         time.setText("0");
         timer.start();
+    }
+
+    public void setResetIcon(String icon) {
+        reset.setIcon(new ImageIcon(ImagePath.getResource(icon).getScaledInstance((int) (tileSize * 1.5), (int) (tileSize * 1.5), Image.SCALE_SMOOTH)));
     }
 
     public int getTileSize() {

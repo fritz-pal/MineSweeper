@@ -10,6 +10,7 @@ public class Board extends JPanel {
     private final Window window;
     private boolean firstClick = true;
     private boolean lost = false;
+    private boolean win = false;
     private int minesLeft;
 
     public Board(Window window, int rows, int columns, int mines) {
@@ -87,7 +88,12 @@ public class Board extends JPanel {
         for (Tile[] tile : tiles) {
             for (Tile value : tile) {
                 if (value.isMine()) {
-                    value.setState(TileState.UNCOVERED);
+                    if (value.getState() != TileState.FLAGGED) {
+                        value.setState(TileState.UNCOVERED);
+                        value.repaint();
+                    }
+                } else if (value.getState() == TileState.FLAGGED) {
+                    value.setState(TileState.WRONG_FLAGGED);
                     value.repaint();
                 }
             }
@@ -100,6 +106,15 @@ public class Board extends JPanel {
 
     public boolean isLost() {
         return this.lost;
+    }
+
+    public boolean isWin() {
+        return this.win;
+    }
+
+    public void oh(boolean oh) {
+        if (oh) window.setResetIcon("oh.png");
+        else window.setResetIcon("smile.png");
     }
 
     public int getMinesLeft() {
@@ -119,6 +134,7 @@ public class Board extends JPanel {
 
         if (tiles[row][column].isMine()) {
             Sound.play("lose.wav");
+            window.setResetIcon("dead.png");
             gameOver();
             window.stopTime();
             lost = true;
@@ -139,7 +155,9 @@ public class Board extends JPanel {
     public void reset() {
         firstClick = true;
         lost = false;
+        win = false;
         minesLeft = mines;
+        window.setResetIcon("smile.png");
         window.updateMines();
         window.resetTime();
         for (Tile[] tile : tiles) {
@@ -164,6 +182,8 @@ public class Board extends JPanel {
         }
         if (uncovered == rows * columns - mines) {
             Sound.play("win.wav");
+            window.setResetIcon("cool.png");
+            win = true;
             gameOver();
             window.stopTime();
             JOptionPane.showMessageDialog(window, "You won in " + window.getTime() + " seconds!");
@@ -172,5 +192,30 @@ public class Board extends JPanel {
 
     public int getTileSize() {
         return window.getTileSize();
+    }
+
+    public void autoUncover(int row, int column) {
+        if (this.tiles[row][column].getState() != TileState.UNCOVERED) return;
+        int flags = 0;
+        for (int r = row - 1; r <= row + 1; r++) {
+            for (int c = column - 1; c <= column + 1; c++) {
+                if (r >= 0 && r < this.rows && c >= 0 && c < this.columns) {
+                    if (this.tiles[r][c].getState() == TileState.FLAGGED) {
+                        flags++;
+                    }
+                }
+            }
+        }
+        if (flags == tiles[row][column].getAdjacentMines()) {
+            for (int r = row - 1; r <= row + 1; r++) {
+                for (int c = column - 1; c <= column + 1; c++) {
+                    if (r >= 0 && r < this.rows && c >= 0 && c < this.columns) {
+                        if (this.tiles[r][c].getState() == TileState.COVERED) {
+                            uncover(r, c, true);
+                        }
+                    }
+                }
+            }
+        }
     }
 }
